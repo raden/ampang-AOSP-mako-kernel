@@ -28,8 +28,8 @@
 #include <linux/rcupdate.h>
 #include "input-compat.h"
 
-#ifdef CONFIG_PWRKEY_SUSPEND
-#include <linux/input/pmic8xxx-pwrkey.h>
+#ifdef CONFIG_TOUCH_WAKE
+#include <linux/touch_wake.h>
 #endif
 
 MODULE_AUTHOR("Vojtech Pavlik <vojtech@suse.cz>");
@@ -291,6 +291,7 @@ static int input_get_disposition(struct input_dev *dev,
 	case EV_KEY:
 		if (is_event_supported(code, dev->keybit, KEY_MAX) &&
 		    !!test_bit(code, dev->key) != value) {
+<<<<<<< HEAD
 
 #ifdef CONFIG_PWRKEY_SUSPEND
 		if (pwrkey_suspend) {
@@ -301,6 +302,15 @@ static int input_get_disposition(struct input_dev *dev,
 				cnt = 0;
 				}
 		}
+=======
+#ifdef CONFIG_TOUCH_WAKE
+			if (code == KEY_POWER && !device_is_suspended()) {
+				if (value == 1)
+					powerkey_pressed();
+				else if (value == 0)
+          				powerkey_released();
+        		}
+>>>>>>> 51f9b6f... drivers: misc: Initial support for touchwake
 #endif
 			if (value != 2) {
 				__change_bit(code, dev->key);
