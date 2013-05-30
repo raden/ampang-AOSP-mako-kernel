@@ -2459,7 +2459,11 @@ int wlan_hdd_crda_reg_notifier(struct wiphy *wiphy,
           }
           /* Haven't seen any condition that will set by driver after init.
            If we do, then we should also call sme_ChangeCountryCode */
-          if (wiphy->bands[IEEE80211_BAND_5GHZ])
+
+          if (!wiphy->bands[IEEE80211_BAND_5GHZ])
+              goto check_initiator;
+
+          for (j=0; j<wiphy->bands[IEEE80211_BAND_5GHZ ]->n_channels; j++)
           {
              for (j=0; j<wiphy->bands[IEEE80211_BAND_5GHZ]->n_channels; j++)
              {
@@ -2482,6 +2486,9 @@ int wlan_hdd_crda_reg_notifier(struct wiphy *wiphy,
                 }
              }
           }
+
+check_initiator:
+
           if (request->initiator == NL80211_REGDOM_SET_BY_CORE)
           {
              request->processed = 1;
