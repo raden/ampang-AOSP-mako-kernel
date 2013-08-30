@@ -304,8 +304,7 @@ static int input_get_disposition(struct input_dev *dev,
 		}
 =======
 #ifdef CONFIG_TOUCH_WAKE
-			if (code == KEY_POWER && touchwake_is_enabled() &&
-						!device_is_suspended()) {
+			if (code == KEY_POWER && !device_is_suspended()) {
 				if (value == 1)
 					powerkey_pressed();
 				else if (value == 0)
