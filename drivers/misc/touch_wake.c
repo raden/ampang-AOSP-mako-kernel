@@ -62,35 +62,22 @@ static void touchwake_enable_touch(void)
 	return;
 }
 
-bool touchwake_is_enabled(void)
+static void touchwake_early_suspend(struct early_suspend * h)
 {
-	return touchwake_enabled;
-}
-EXPORT_SYMBOL(touchwake_is_enabled);
-
-static void touchwake_early_suspend(struct early_suspend *h)
-
-{
-	if (!touchwake_enabled)
-		goto out;
-
-	if (timed_out) {
+	if (touchwake_enabled && timed_out) {
 		wake_lock(&touchwake_wake_lock);
 		schedule_delayed_work(&touchoff_work,
 					msecs_to_jiffies(touchoff_delay));
 	} else
 		touchwake_disable_touch();
 
-	//mdelay(POWERPRESS_TIMEOUT);
-out:
+	mdelay(POWERPRESS_TIMEOUT);
 	device_suspended = true;
+	return;
 }
 
 static void touchwake_late_resume(struct early_suspend * h)
 {
-	if (!touchwake_enabled)
-		goto out;
-
 	cancel_delayed_work(&touchoff_work);
 	flush_scheduled_work();
 
@@ -100,9 +87,8 @@ static void touchwake_late_resume(struct early_suspend * h)
 		touchwake_enable_touch();
 
 	timed_out = true;
-
-out:
 	device_suspended = false;
+	return;
 }
 
 static struct early_suspend touchwake_suspend_data =
@@ -306,10 +292,6 @@ static int __init touchwake_control_init(void)
 	}
 
 	do_gettimeofday(&last_powerkeypress);
-
-	powerkey_flag = 0;
-
-	ret = led_trigger_register(&touchwake_led_trigger);
 
 	return 0;
 }
