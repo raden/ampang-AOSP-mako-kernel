@@ -43,6 +43,9 @@
 #include <linux/input/doubletap2wake.h>
 #endif
 #endif
+#ifdef CONFIG_PWRKEY_SUSPEND
+#include <linux/input/pmic8xxx-pwrkey.h>
+#endif
 
 struct touch_device_driver*     touch_device_func;
 struct workqueue_struct*        touch_wq;
@@ -2074,6 +2077,10 @@ static void touch_early_suspend(struct early_suspend *h)
         prevent_sleep = prevent_sleep || (dt2w_switch > 0);
 #endif
 #endif
+#ifdef CONFIG_PWRKEY_SUSPEND
+	if (pwrkey_pressed)
+		prevent_sleep = false;
+#endif
 	if (unlikely(touch_debug_mask & DEBUG_TRACE))
 		TOUCH_DEBUG_MSG("\n");
 
@@ -2123,6 +2130,10 @@ static void touch_late_resume(struct early_suspend *h)
         prevent_sleep = prevent_sleep || (dt2w_switch > 0);
 #endif
 #endif
+#ifdef CONFIG_PWRKEY_SUSPEND
+	if (pwrkey_pressed)
+		prevent_sleep = false;
+#endif
 	if (unlikely(touch_debug_mask & DEBUG_TRACE))
 		TOUCH_DEBUG_MSG("\n");
 
@@ -2135,6 +2146,7 @@ static void touch_late_resume(struct early_suspend *h)
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
         if (!prevent_sleep) {
+		pwrkey_pressed = false;
 #endif
 	        touch_power_cntl(ts, ts->pdata->role->resume_pwr);
 
