@@ -13,7 +13,7 @@ export CROSS_COMPILE=/opt/AK-linaro/4.7.3-2013.04.20130415/bin/arm-linux-gnueabi
 
 export KBUILD_BUILD_USER=najmi
 export KBUILD_BUILD_HOST="ampang"
-export LOCALVERSION="-Ampang-AOSP-kernel-RELENG-kexec"
+export LOCALVERSION="-Ampang-AOSP-kernel-RELENG-iPhone-color"
 
 #echo "Copy backup config..."
 #cp najmi-mako-config .config
