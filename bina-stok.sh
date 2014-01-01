@@ -9,12 +9,13 @@ export CROSS_COMPILE=/opt/sabermod-gcc/bin/arm-eabi-
 
 export KBUILD_BUILD_USER=najmi
 export KBUILD_BUILD_HOST="ampang"
-export LOCALVERSION="-Aufa-kernel-REL-V9"
+export LOCALVERSION="-aufa-hc-v1"
 
 #echo "Copy backup config..."
 #cp najmi-mako-config .config
-make cyanogen_mako_defconfig
-make menuconfig
+#make cyanogen_mako_defconfig
+make hells_defconfig
+#make menuconfig
 #echo "Begin compile..."
 #make -j8
 
