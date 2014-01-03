@@ -64,13 +64,6 @@ MODULE_LICENSE("GPLv2");
 #define S2W_X_B1                400
 #define S2W_X_B2                700
 #define S2W_X_FINAL             250
-#elif defined(CONFIG_MACH_APQ8064_MAKO)
-/* Mako aka Nexus 4 */
-#define S2W_Y_LIMIT             2350
-#define S2W_X_MAX               1540
-#define S2W_X_B1                500
-#define S2W_X_B2                1000
-#define S2W_X_FINAL             300
 #else
 /* defaults */
 #define S2W_Y_LIMIT             2350
@@ -83,7 +76,6 @@ MODULE_LICENSE("GPLv2");
 
 /* Resources */
 int s2w_switch = S2W_DEFAULT;
-bool s2w_error = false;
 static int touch_x = 0, touch_y = 0;
 static bool touch_x_called = false, touch_y_called = false;
 static bool scr_suspended = false, exec_count = true;
@@ -424,6 +416,12 @@ static int __init sweep2wake_init(void)
 	sweep2wake_pwrdev->name = "s2w_pwrkey";
 	sweep2wake_pwrdev->phys = "s2w_pwrkey/input0";
 
+	rc = input_register_device(sweep2wake_pwrdev);
+	if (rc) {
+		pr_err("%s: input_register_device err=%d\n", __func__, rc);
+		goto err_input_dev;
+	}
+
 	s2w_input_wq = create_workqueue("s2wiwq");
 	if (!s2w_input_wq) {
 		pr_err("%s: Failed to create s2wiwq workqueue\n", __func__);
@@ -458,6 +456,8 @@ static int __init sweep2wake_init(void)
 		pr_warn("%s: sysfs_create_file failed for sweep2wake_version\n", __func__);
 	}
 
+err_input_dev:
+	input_free_device(sweep2wake_pwrdev);
 err_alloc_dev:
 	pr_info(LOGTAG"%s done\n", __func__);
 
