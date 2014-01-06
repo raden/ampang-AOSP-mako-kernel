@@ -763,13 +763,13 @@ static char display_mode2 [8] = {0xB6, 0x00, 0x14, 0x0F, 0x16, 0x13, 0x05, 0x05}
 //static char p_gamma_b_setting[10] = {0xD4, 0x20, 0x23, 0x74, 0x00, 0x1F, 0x10, 0x50, 0x33, 0x03};
 //static char n_gamma_b_setting[10] = {0xD5, 0x20, 0x23, 0x74, 0x00, 0x1F, 0x10, 0x50, 0x33, 0x03};
 
-#define g_white       0x40
-#define g_mids        0x44
-#define g_black       0x76
-#define g_contrast    0x19
-#define g_brightness  0x04
-#define g_saturation  0x42
-#define g_greys       0x20
+#define g_white       0x00
+#define g_mids        0x27
+#define g_black       0x77
+#define g_contrast    0x06
+#define g_brightness  0x00
+#define g_saturation  0x02
+#define g_greys       0x00
 
 static char p_gamma_r_setting[10] = {0xD0, g_white, g_mids, g_black, 0x00, g_contrast, g_brightness, g_saturation, g_greys, 0x01};
 static char n_gamma_r_setting[10] = {0xD1, g_white, g_mids, g_black, 0x00, g_contrast, g_brightness, g_saturation, g_greys, 0x01};
