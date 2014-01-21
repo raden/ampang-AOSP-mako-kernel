@@ -2300,6 +2300,7 @@ static void touch_late_resume(struct early_suspend *h)
 	if (ts->dt_wake.enabled) {
 		wake_unlock(&ts->dt_wake.wlock);
 		disable_irq_wake(ts->client->irq);
+		release_all_ts_event(ts);
 	} else {
 #endif
 		touch_power_cntl(ts, ts->pdata->role->resume_pwr);
