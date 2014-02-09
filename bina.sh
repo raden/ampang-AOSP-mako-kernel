@@ -4,7 +4,7 @@ unset CROSS_COMPILE
 #export CROSS_COMPILE=/opt/gcc-4.7-linaro/bin/arm-cortex_a15-linux-gnueabi- 
 export CROSS_COMPILE=/opt/sabermod-gcc/bin/arm-eabi-
 
-#echo "Cleaning old craps..."
+#echo "Cleaning old builds..."
 #make distclean
 
 export KBUILD_BUILD_USER=najmi
