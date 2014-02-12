@@ -1,6 +1,6 @@
 VERSION = 3
 PATCHLEVEL = 4
-SUBLEVEL = 76
+SUBLEVEL = 79
 EXTRAVERSION =
 NAME = Saber-toothed Squirrel
 
@@ -193,7 +193,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
-CROSS_COMPILE	?= /home/hellsgod/Android_Toolchains/android-toolchain-eabi-4.8/bin/arm-eabi-
+CROSS_COMPILE	?= /home/hellsgod/Android/Kernel/linaro_toolchains_2014/arm-linux-gnueabi-linaro_4.8.3-2014.01/bin/arm-gnueabi-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -354,8 +354,8 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 CFLAGS_MODULE   = -fno-pic
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -mcpu=cortex-a9 -mtune=cortex-a15 -marm -march=armv7-a -mfpu=neon -funsafe-math-optimizations -ftree-vectorize
-AFLAGS_KERNEL	= -mcpu=cortex-a9 -mtune=cortex-a15 -marm -march=armv7-a -mfpu=neon -funsafe-math-optimizations -ftree-vectorize
+CFLAGS_KERNEL	= -mtune=cortex-a15 -marm -mfpu=neon -funsafe-math-optimizations -ftree-vectorize
+AFLAGS_KERNEL	= -mtune=cortex-a15 -marm -mfpu=neon -funsafe-math-optimizations -ftree-vectorize
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
@@ -371,7 +371,7 @@ KBUILD_CPPFLAGS := -D__KERNEL__
 #
 # LINARO OPT
 #
-CFLAGS_A15 = -mcpu=cortex-a9 -march=armv7-a -mtune=cortex-a15 -mfpu=neon -funsafe-math-optimizations
+CFLAGS_A15 = -mtune=cortex-a15 -mfpu=neon -funsafe-math-optimizations
 CFLAGS_MODULO = -fmodulo-sched -fmodulo-sched-allow-regmoves
 KERNEL_MODS  = $(CFLAGS_A15) $(CFLAGS_MODULO)
 
