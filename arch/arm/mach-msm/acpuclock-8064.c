@@ -180,6 +180,7 @@ static struct acpu_level tbl_slow[] __initdata = {
 	{ 1, {   378000, HFPLL, 2, 0x1C }, L2(0),   850000 },
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(1),   850000 },
 #else
+	{ 1, {    54000, HFPLL, 2, 0x04 }, L2(0),   625000 },
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   850000 },
 #endif
 	{ 0, {   432000, HFPLL, 2, 0x20 }, L2(5),   875000 },
@@ -220,6 +221,7 @@ static struct acpu_level tbl_nom[] __initdata = {
 	{ 1, {   378000, HFPLL, 2, 0x1C }, L2(0),   800000 },
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(1),   800000 },
 #else
+	{ 1, {    54000, HFPLL, 2, 0x04 }, L2(0),   625000 },
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   800000 },
 #endif
 	{ 0, {   432000, HFPLL, 2, 0x20 }, L2(5),   825000 },
@@ -261,7 +263,8 @@ static struct acpu_level tbl_fast[] __initdata = {
 	{ 1, {   378000, HFPLL, 2, 0x1C }, L2(0),   750000 },
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(1),   750000 },
 #else
-	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   750000 },
+	{ 1, {    54000, HFPLL, 2, 0x04 }, L2(0),   625000 },
+	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   775000 },
 #endif
 	{ 0, {   432000, HFPLL, 2, 0x20 }, L2(5),   775000 },
 	{ 1, {   486000, HFPLL, 2, 0x24 }, L2(5),   775000 },
@@ -302,7 +305,8 @@ static struct acpu_level tbl_faster[] __initdata = {
 	{ 1, {   378000, HFPLL, 2, 0x1C }, L2(0),   850000 },
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(1),   850000 },
 #else
-	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   850000 },
+	{ 1, {    54000, HFPLL, 2, 0x04 }, L2(0),   625000 },
+	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   775000 },
 #endif
 	{ 0, {   432000, HFPLL, 2, 0x20 }, L2(5),   875000 },
 	{ 1, {   486000, HFPLL, 2, 0x24 }, L2(5),   875000 },
@@ -747,6 +751,7 @@ static struct acpuclk_krait_params acpuclk_8064_params __initdata = {
 	.l2_freq_tbl_size = sizeof(l2_freq_tbl),
 	.bus_scale = &bus_scale_data,
 	.pte_efuse_phys = 0x007000C0,
+//	.get_bin_info = get_krait_bin_format_a,	
 	.stby_khz = 384000,
 };
 
