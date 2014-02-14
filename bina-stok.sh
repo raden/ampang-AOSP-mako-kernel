@@ -13,7 +13,7 @@ export CROSS_COMPILE=/opt/sabermod-gcc/bin/arm-eabi-
 
 export KBUILD_BUILD_USER=najmi
 export KBUILD_BUILD_HOST="ampang"
-export LOCALVERSION="-Ampang-AOSP-kernel-v15-overclock"
+export LOCALVERSION="-Ampang-AOSP-kernel-v15"
 
 #echo "Copy backup config..."
 #cp najmi-mako-config .config
