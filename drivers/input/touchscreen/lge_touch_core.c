@@ -50,7 +50,7 @@ struct lge_touch_attribute {
 };
 
 #ifdef CONFIG_TOUCH_WAKE
-static struct lge_touch_data * touchwake_data;
+static struct lge_touch_data *touchwake_data;
 static unsigned suspending = 0;
 #endif
 
@@ -865,13 +865,6 @@ static void touch_input_report(struct lge_touch_data *ts)
 	for (id = 0; id < ts->pdata->caps->max_id; id++) {
 		if (!ts->ts_data.curr_data[id].state)
 			continue;
-#ifdef CONFIG_TOUCH_WAKE		
-		if (unlikely(!suspending && device_is_suspended())) {
-			ts->ts_data.curr_data[id].state = 0;
-			touch_press();
-			continue;
-		}
-#endif
 
 		input_mt_slot(ts->input_dev, id);
 		input_mt_report_slot_state(ts->input_dev,
@@ -2139,7 +2132,6 @@ static int touch_probe(struct i2c_client *client,
 #ifdef CONFIG_TOUCH_WAKE
 	touchwake_data = ts;
 #endif
-
 #ifdef CONFIG_DOUBLETAP_WAKE
 	mutex_init(&ts->dt_wake.lock);
 	ts->dt_wake.enabled = 0;
@@ -2153,8 +2145,7 @@ static int touch_probe(struct i2c_client *client,
 
 	input_set_capability(ts->input_dev, EV_KEY, KEY_POWER);
 #endif
-	
-/* Register sysfs for making fixed communication path to framework layer */
+	/* Register sysfs for making fixed communication path to framework layer */
 	ret = sysdev_class_register(&lge_touch_sys_class);
 	if (ret < 0) {
 		TOUCH_ERR_MSG("sysdev_class_register is failed\n");
@@ -2256,45 +2247,8 @@ static int touch_remove(struct i2c_client *client)
 	return 0;
 }
 
-#if defined(CONFIG_HAS_EARLYSUSPEND)
-static void touch_early_suspend(struct early_suspend *h)
+static void touch_power_on(struct lge_touch_data *ts)
 {
-#ifndef CONFIG_TOUCH_WAKE
-	struct lge_touch_data *ts =
-			container_of(h, struct lge_touch_data, early_suspend);
-
-	if (unlikely(touch_debug_mask & DEBUG_TRACE))
-		TOUCH_DEBUG_MSG("\n");
-
-	ts->curr_resume_state = 0;
-
-	if (ts->fw_upgrade.is_downloading == UNDER_DOWNLOADING) {
-		TOUCH_INFO_MSG("early_suspend is not executed\n");
-		return;
-	}
-
-	if (ts->pdata->role->operation_mode == INTERRUPT_MODE)
-		disable_irq(ts->client->irq);
-	else
-		hrtimer_cancel(&ts->timer);
-
-	cancel_work_sync(&ts->work);
-	cancel_delayed_work_sync(&ts->work_init);
-	if (ts->pdata->role->key_type == TOUCH_HARD_KEY)
-		cancel_delayed_work_sync(&ts->work_touch_lock);
-
-	release_all_ts_event(ts);
-
-	touch_power_cntl(ts, ts->pdata->role->suspend_pwr);
-#endif
-}
-
-static void touch_late_resume(struct early_suspend *h)
-{
-#ifndef CONFIG_TOUCH_WAKE
-	struct lge_touch_data *ts =
-			container_of(h, struct lge_touch_data, early_suspend);
-
 	if (unlikely(touch_debug_mask & DEBUG_TRACE))
 		TOUCH_DEBUG_MSG("\n");
 
@@ -2316,19 +2270,7 @@ static void touch_late_resume(struct early_suspend *h)
 		else
 			hrtimer_cancel(&ts->timer);
 		release_all_ts_event(ts);
-/**
-	if (ts->pdata->role->resume_pwr == POWER_ON)
-		queue_delayed_work(touch_wq, &ts->work_init,
-			msecs_to_jiffies(ts->pdata->role->booting_delay));
-	else
-		queue_delayed_work(touch_wq, &ts->work_init, 0);
-		if (ts->pdata->role->resume_pwr == POWER_ON)
-			queue_delayed_work(touch_wq, &ts->work_init,
-				msecs_to_jiffies(ts->pdata->role->booting_delay));
-		else
-			queue_delayed_work(touch_wq, &ts->work_init, 0);
-#ifdef CONFIG_DOUBLETAP_WAKE
-**/
+
 		touch_power_cntl(ts, ts->pdata->role->suspend_pwr);
 	}
 #endif
@@ -2355,14 +2297,9 @@ static void touch_late_resume(struct early_suspend *h)
 	}
 #endif
 }
-#endif
 
-#ifdef CONFIG_TOUCH_WAKE
-void touchscreen_disable(void)
+static void touch_power_off(struct lge_touch_data *ts)
 {
-	struct lge_touch_data *ts = touchwake_data;
-	suspending = 1;
-	
 	if (unlikely(touch_debug_mask & DEBUG_TRACE))
 		TOUCH_DEBUG_MSG("\n");
 
@@ -2394,110 +2331,52 @@ void touchscreen_disable(void)
 
 	release_all_ts_event(ts);
 
-//	touch_power_cntl(ts, ts->pdata->role->suspend_pwr);
-//	suspending = 0;
-//		touch_power_cntl(ts, ts->pdata->role->suspend_pwr);
 	touch_power_cntl(ts, ts->pdata->role->suspend_pwr);
 #ifdef CONFIG_DOUBLETAP_WAKE
 	}
 #endif
-
 }
-EXPORT_SYMBOL(touchscreen_disable);
 
-void touchscreen_enable(void)
+#if defined(CONFIG_HAS_EARLYSUSPEND)
+static void touch_early_suspend(struct early_suspend *h)
 {
-	struct lge_touch_data *ts = touchwake_data;
+	struct lge_touch_data *ts =
+			container_of(h, struct lge_touch_data, early_suspend);
 
-	if (unlikely(touch_debug_mask & DEBUG_TRACE))
-		TOUCH_DEBUG_MSG("\n");
-
-	ts->curr_resume_state = 1;
-
-	if (ts->fw_upgrade.is_downloading == UNDER_DOWNLOADING) {
-		TOUCH_INFO_MSG("late_resume is not executed\n");
-		return;
-	}
-
-	touch_power_cntl(ts, ts->pdata->role->resume_pwr);
-
-	if (ts->pdata->role->operation_mode == INTERRUPT_MODE)
-		enable_irq(ts->client->irq);
-	else
-		hrtimer_start(&ts->timer,
-			ktime_set(0, ts->pdata->role->report_period),
-					HRTIMER_MODE_REL);
-
-	if (ts->pdata->role->resume_pwr == POWER_ON)
-		queue_delayed_work(touch_wq, &ts->work_init,
-			msecs_to_jiffies(ts->pdata->role->booting_delay));
-	else
-		queue_delayed_work(touch_wq, &ts->work_init, 0);
+#ifdef CONFIG_TOUCH_WAKE
+	if (touchwake_is_enabled())
+		return;	/* touchwake will handle touchscreen suspend call */
 #endif
+	/* touchwake is not compiled or it's disabled - handle suspend */
+	touch_power_off(ts);
+}
+
+static void touch_late_resume(struct early_suspend *h)
+{
+	struct lge_touch_data *ts =
+			container_of(h, struct lge_touch_data, early_suspend);
+
+#ifdef CONFIG_TOUCH_WAKE
+	if (touchwake_is_enabled())
+		return;
+#endif
+	/* touchwake is not compiled or it's disabled - handle wake */
+	touch_power_on(ts);
 }
 #endif
 
 #ifdef CONFIG_TOUCH_WAKE
 void touchscreen_disable(void)
 {
-	struct lge_touch_data *ts = touchwake_data;
 	suspending = 1;
-	
-	if (unlikely(touch_debug_mask & DEBUG_TRACE))
-		TOUCH_DEBUG_MSG("\n");
-
-	ts->curr_resume_state = 0;
-
-	if (ts->fw_upgrade.is_downloading == UNDER_DOWNLOADING) {
-		TOUCH_INFO_MSG("early_suspend is not executed\n");
-		return;
-	}
-
-	if (ts->pdata->role->operation_mode == INTERRUPT_MODE)
-		disable_irq(ts->client->irq);
-	else
-		hrtimer_cancel(&ts->timer);
-
-	cancel_work_sync(&ts->work);
-	cancel_delayed_work_sync(&ts->work_init);
-	if (ts->pdata->role->key_type == TOUCH_HARD_KEY)
-		cancel_delayed_work_sync(&ts->work_touch_lock);
-
-	release_all_ts_event(ts);
-
-	touch_power_cntl(ts, ts->pdata->role->suspend_pwr);
+	touch_power_off(touchwake_data);
 	suspending = 0;
 }
 EXPORT_SYMBOL(touchscreen_disable);
 
 void touchscreen_enable(void)
 {
-	struct lge_touch_data *ts = touchwake_data;
-
-	if (unlikely(touch_debug_mask & DEBUG_TRACE))
-		TOUCH_DEBUG_MSG("\n");
-
-	ts->curr_resume_state = 1;
-
-	if (ts->fw_upgrade.is_downloading == UNDER_DOWNLOADING) {
-		TOUCH_INFO_MSG("late_resume is not executed\n");
-		return;
-	}
-
-	touch_power_cntl(ts, ts->pdata->role->resume_pwr);
-
-	if (ts->pdata->role->operation_mode == INTERRUPT_MODE)
-		enable_irq(ts->client->irq);
-	else
-		hrtimer_start(&ts->timer,
-			ktime_set(0, ts->pdata->role->report_period),
-					HRTIMER_MODE_REL);
-
-	if (ts->pdata->role->resume_pwr == POWER_ON)
-		queue_delayed_work(touch_wq, &ts->work_init,
-			msecs_to_jiffies(ts->pdata->role->booting_delay));
-	else
-		queue_delayed_work(touch_wq, &ts->work_init, 0);
+	touch_power_on(touchwake_data);
 }
 EXPORT_SYMBOL(touchscreen_enable);
 #endif
