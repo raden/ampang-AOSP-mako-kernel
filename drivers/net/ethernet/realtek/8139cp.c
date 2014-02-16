@@ -524,6 +524,10 @@ rx_status_loop:
 					 PCI_DMA_FROMDEVICE);
 		if (dma_mapping_error(&cp->pdev->dev, new_mapping)) {
 			dev->stats.rx_dropped++;
+<<<<<<< HEAD
+=======
+			kfree_skb(new_skb);
+>>>>>>> c030d99d02079e48a05ba51107de57cd0c4876f9
 			goto rx_next;
 		}
 

@@ -1430,7 +1430,11 @@ radeon_atom_encoder_dpms_dig(struct drm_encoder *encoder, int mode)
 			 * does the same thing and more.
 			 */
 			if ((rdev->family != CHIP_RV710) && (rdev->family != CHIP_RV730) &&
+<<<<<<< HEAD
 			    (rdev->family != CHIP_RS880))
+=======
+			    (rdev->family != CHIP_RS780) && (rdev->family != CHIP_RS880))
+>>>>>>> c030d99d02079e48a05ba51107de57cd0c4876f9
 				atombios_dig_transmitter_setup(encoder, ATOM_TRANSMITTER_ACTION_ENABLE_OUTPUT, 0, 0);
 		}
 		if (ENCODER_MODE_IS_DP(atombios_get_encoder_mode(encoder)) && connector) {

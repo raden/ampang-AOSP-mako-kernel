@@ -1784,6 +1784,7 @@ static void setup_frame_info(struct ieee80211_hw *hw, struct sk_buff *skb,
 	struct ath_node *an = NULL;
 	enum ath9k_key_type keytype;
 	bool short_preamble = false;
+<<<<<<< HEAD
 
 	/*
 	 * We check if Short Preamble is needed for the CTS rate by
@@ -1794,6 +1795,18 @@ static void setup_frame_info(struct ieee80211_hw *hw, struct sk_buff *skb,
 	    tx_info->control.vif->bss_conf.use_short_preamble)
 		short_preamble = true;
 
+=======
+
+	/*
+	 * We check if Short Preamble is needed for the CTS rate by
+	 * checking the BSS's global flag.
+	 * But for the rate series, IEEE80211_TX_RC_USE_SHORT_PREAMBLE is used.
+	 */
+	if (tx_info->control.vif &&
+	    tx_info->control.vif->bss_conf.use_short_preamble)
+		short_preamble = true;
+
+>>>>>>> c030d99d02079e48a05ba51107de57cd0c4876f9
 	rate = ieee80211_get_rts_cts_rate(hw, tx_info);
 	keytype = ath9k_cmn_get_hw_crypto_keytype(skb);
 
@@ -2479,6 +2492,7 @@ void ath_tx_node_init(struct ath_softc *sc, struct ath_node *an)
 	for (acno = 0, ac = &an->ac[acno];
 	     acno < WME_NUM_AC; acno++, ac++) {
 		ac->sched    = false;
+		ac->clear_ps_filter = true;
 		ac->txq = sc->tx.txq_map[acno];
 		INIT_LIST_HEAD(&ac->tid_q);
 	}

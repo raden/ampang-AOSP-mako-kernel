@@ -125,6 +125,12 @@ static struct edid_quirk {
 
 	/* ViewSonic VA2026w */
 	{ "VSC", 5020, EDID_QUIRK_FORCE_REDUCED_BLANKING },
+<<<<<<< HEAD
+=======
+
+	/* Medion MD 30217 PG */
+	{ "MED", 0x7b8, EDID_QUIRK_PREFER_LARGE_75 },
+>>>>>>> c030d99d02079e48a05ba51107de57cd0c4876f9
 };
 
 /*** DDC fetch and block validation ***/

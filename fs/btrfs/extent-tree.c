@@ -7033,7 +7033,11 @@ out:
 	 */
 	if (root_dropped == false)
 		btrfs_add_dead_root(root);
+<<<<<<< HEAD
 	if (err)
+=======
+	if (err && err != -EAGAIN)
+>>>>>>> c030d99d02079e48a05ba51107de57cd0c4876f9
 		btrfs_std_error(root->fs_info, err);
 	return err;
 }
