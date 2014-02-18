@@ -94,11 +94,6 @@ static struct pointer_trace tr_data[MAX_TRACE];
 static int tr_last_index;
 #endif
 
-#define BOOSTED_TIME	1000	/* ms */
-int mako_boosted;
-static unsigned int boosted_time = BOOSTED_TIME;
-static struct timer_list boost_timer;
-
 #if defined(CONFIG_HAS_EARLYSUSPEND)
 static void touch_early_suspend(struct early_suspend *h);
 static void touch_late_resume(struct early_suspend *h);
@@ -446,7 +441,6 @@ static int touch_ic_init(struct lge_touch_data *ts)
 
 err_out_retry:
 	ts->ic_init_err_cnt++;
-	disable_irq_nosync(ts->client->irq);
 	safety_reset(ts);
 	queue_delayed_work(touch_wq, &ts->work_init, msecs_to_jiffies(10));
 
@@ -917,19 +911,6 @@ static void touch_input_report(struct lge_touch_data *ts)
 	input_sync(ts->input_dev);
 }
 
-static void touch_boost(void)
-{
-	if (boosted_time) {
-		mako_boosted = 1;
-		mod_timer(&boost_timer, jiffies + msecs_to_jiffies(boosted_time));
-	}
-}
-
-static void handle_boost(unsigned long data)
-{
-	mako_boosted = 0;
-}
-
 /*
  * Touch work function
  */
@@ -943,8 +924,6 @@ static void touch_work_func(struct work_struct *work)
 
 	atomic_dec(&ts->next_work);
 	ts->ts_data.total_num = 0;
-
-	touch_boost();
 
 	if (unlikely(ts->work_sync_err_cnt >= MAX_RETRY_COUNT)) {
 		TOUCH_ERR_MSG("Work Sync Failed: Irq-pin has some unknown problems\n");
@@ -2262,7 +2241,6 @@ static int touch_remove(struct i2c_client *client)
 		hrtimer_cancel(&ts->timer);
 	}
 
-	del_timer(&boost_timer);
 	input_unregister_device(ts->input_dev);
 	input_free_device(ts->input_dev);
 	kfree(ts);
