@@ -291,18 +291,6 @@ static int input_get_disposition(struct input_dev *dev,
 	case EV_KEY:
 		if (is_event_supported(code, dev->keybit, KEY_MAX) &&
 		    !!test_bit(code, dev->key) != value) {
-<<<<<<< HEAD
-
-#ifdef CONFIG_PWRKEY_SUSPEND
-		if (pwrkey_suspend) {
-			if (code == KEY_POWER && cnt == 0) {
-				pwrkey_pressed = true;
-				cnt++;
-			} else {
-				cnt = 0;
-				}
-		}
-=======
 #ifdef CONFIG_TOUCH_WAKE
 			if (code == KEY_POWER && touchwake_is_enabled() &&
 						!device_is_suspended()) {
@@ -311,7 +299,6 @@ static int input_get_disposition(struct input_dev *dev,
 				else if (value == 0)
           				powerkey_released();
         		}
->>>>>>> 51f9b6f... drivers: misc: Initial support for touchwake
 #endif
 			if (value != 2) {
 				__change_bit(code, dev->key);
