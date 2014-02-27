@@ -1,6 +1,6 @@
 VERSION = 3
 PATCHLEVEL = 4
-SUBLEVEL = 79
+SUBLEVEL = 82
 EXTRAVERSION =
 NAME = Saber-toothed Squirrel
 
@@ -193,7 +193,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
-CROSS_COMPILE	?= /home/hellsgod/Android/Kernel/linaro_toolchains_2014/arm-linux-gnueabi-linaro_4.8.3-2014.01/bin/arm-gnueabi-
+CROSS_COMPILE	?= /home/hellsgod/Android/Kernel/linaro_toolchains_2014/arm-linux-gnueabi-linaro_4.8.3-2014.02/bin/arm-gnueabi-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
