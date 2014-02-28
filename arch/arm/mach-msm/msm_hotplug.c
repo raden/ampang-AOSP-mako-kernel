@@ -98,7 +98,7 @@ static struct cpu_stats *get_load_stats(void)
 	struct cpu_stats *st = &stats;
 
 	st->online_cpus = num_online_cpus();
-	st->load_hist[st->hist_cnt] = report_load_at_max_freq();
+//	st->load_hist[st->hist_cnt] = report_load_at_max_freq();
 
 	for (i = 0, j = st->hist_cnt; i < st->hist_size; i++, j--) {
 		load += st->load_hist[j];
@@ -240,8 +240,10 @@ static void msm_hotplug_fn(struct work_struct *work)
 		goto reschedule;
 	}
 
-	if (online_cpus < hp->cpus_boosted && lge_boosted) {
+//	if (online_cpus < hp->cpus_boosted && lge_boosted) {
+	if (online_cpus < hp->cpus_boosted) {
 		dprintk("%s: cur_load: %3u online_cpus: %u lge_boosted\n",
+//		dprintk("%s: cur_load: %3u online_cpus\n",
 			MSM_HOTPLUG, cur_load, online_cpus);
 		online_cpu(hp->cpus_boosted);
 		goto reschedule;

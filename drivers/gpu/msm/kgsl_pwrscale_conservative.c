@@ -83,12 +83,12 @@ static void conservative_idle(struct kgsl_device *device,
 	int val = 0;
 	unsigned int loadpct;
 
-	if (lge_boosted == 1) {
-		if (boosted_pwrlevel < pwr->active_pwrlevel)
-			kgsl_pwrctrl_pwrlevel_change(device, boosted_pwrlevel);
-
-		return;
-	}
+//	if (lge_boosted == 1) {
+//		if (boosted_pwrlevel < pwr->active_pwrlevel)
+//			kgsl_pwrctrl_pwrlevel_change(device, boosted_pwrlevel);
+//
+//		return;
+//	}
 
 	device->ftbl->power_stats(device, &stats);
 
