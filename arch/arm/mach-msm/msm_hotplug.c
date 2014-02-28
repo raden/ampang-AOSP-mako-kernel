@@ -89,6 +89,28 @@ static struct cpu_stats {
 	.total_cpus = NR_CPUS
 };
 
+static uint32_t limited_max_freq = UINT_MAX;
+static uint32_t limited_min_freq;
+
+static int msm_hotplug_cpufreq_callback(struct notifier_block *nfb,
+					unsigned long event, void *data)
+{
+	struct cpufreq_policy *policy = data;
+
+	switch (event) {
+	case CPUFREQ_INCOMPATIBLE:
+		cpufreq_verify_within_limits(policy, limited_min_freq,
+					     limited_max_freq);
+		break;
+	}
+	return NOTIFY_OK;
+}
+EXPORT_SYMBOL_GPL(msm_hotplug_cpufreq_callback);
+
+//static struct notifier_block msm_hotplug_cpufreq_notifier = {
+//	.notifier_call = msm_hotplug_cpufreq_callback,
+//};
+
 extern unsigned int report_load_at_max_freq(void);
 
 static struct cpu_stats *get_load_stats(void)
@@ -257,12 +279,12 @@ static void msm_hotplug_work(struct work_struct *work)
 		goto reschedule;
 	}
 
-	if (online_cpus < hp->cpus_boosted && lge_boosted) {
-		dprintk("%s: cur_load: %3u online_cpus: %u boosted\n",
-			MSM_HOTPLUG, cur_load, online_cpus);
-		online_cpu(hp->cpus_boosted);
-		goto reschedule;
-	}
+//	if (online_cpus < hp->cpus_boosted && lge_boosted) {
+//		dprintk("%s: cur_load: %3u online_cpus: %u boosted\n",
+//			MSM_HOTPLUG, cur_load, online_cpus);
+//		online_cpu(hp->cpus_boosted);
+//		goto reschedule;
+//	}
 
 	for (i = st->min_cpus; i < NUM_LOAD_LEVELS; i++) {
 		if (cur_load <= load[i].up_threshold
