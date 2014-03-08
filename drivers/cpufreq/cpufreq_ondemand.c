@@ -900,8 +900,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	}
 
 	/* check for frequency boost */
-//	if ((dbs_tuners_ins.boosted || lge_boosted)
-	if ((dbs_tuners_ins.boosted)
+	if ((dbs_tuners_ins.boosted || lge_boosted)
 	    && policy->cur < dbs_tuners_ins.boostfreq) {
 		dbs_freq_increase(policy, dbs_tuners_ins.boostfreq);
 		dbs_tuners_ins.boostfreq = policy->cur;
@@ -926,10 +925,12 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 				(dbs_tuners_ins.up_threshold -
 				 dbs_tuners_ins.down_differential);
 
-//		if ((dbs_tuners_ins.boosted || lge_boosted) &&
-		if ((dbs_tuners_ins.boosted) &&
-				freq_next < dbs_tuners_ins.boostfreq) {
-			freq_next = dbs_tuners_ins.boostfreq;
+		if (mako_boosted && policy->cpu == 0) {
+			if (dbs_tuners_ins.input_boost &&
+					freq_next < dbs_tuners_ins.input_boost)
+				freq_next = dbs_tuners_ins.input_boost;
+			else
+				freq_next = policy->max;
 		}
 		/* No longer fully busy, reset rate_mult */
 		this_dbs_info->rate_mult = 1;
