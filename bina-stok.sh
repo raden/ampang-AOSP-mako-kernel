@@ -13,13 +13,13 @@ export CROSS_COMPILE=/opt/sabermod-gcc/bin/arm-eabi-
 
 export KBUILD_BUILD_USER=najmi
 export KBUILD_BUILD_HOST="ampang"
-export LOCALVERSION="-Ampang-AOSP-kernel-v21-b"
+export LOCALVERSION="-Ampang-AOSP-v22"
 
 #echo "Copy backup config..."
 #cp najmi-mako-config .config
-make mako_defconfig
+#make mako_defconfig
 
-echo "Begin compile..."
-make -j8
+#echo "Begin compile..."
+#make -j8
 
 
