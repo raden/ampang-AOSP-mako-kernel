@@ -29,14 +29,14 @@
 #define INTELLI_PLUG_MAJOR_VERSION	2
 #define INTELLI_PLUG_MINOR_VERSION	2
 
-#define DEF_SAMPLING_MS			(500)
-#define BUSY_SAMPLING_MS		(250)
+#define DEF_SAMPLING_MS			(1000)
+#define BUSY_SAMPLING_MS		(500)
 
-#define DUAL_CORE_PERSISTENCE		14
-#define TRI_CORE_PERSISTENCE		10
-#define QUAD_CORE_PERSISTENCE		6
+#define DUAL_CORE_PERSISTENCE		7
+#define TRI_CORE_PERSISTENCE		5
+#define QUAD_CORE_PERSISTENCE		3
 
-#define BUSY_PERSISTENCE		20
+#define BUSY_PERSISTENCE		10
 
 #define RUN_QUEUE_THRESHOLD		38
 
@@ -356,7 +356,6 @@ static void intelli_plug_input_event(struct input_handle *handle,
 #ifdef DEBUG_INTELLI_PLUG
 	pr_info("intelli_plug touched!\n");
 #endif
-
 	queue_delayed_work_on(0, intelliplug_wq, &intelli_plug_boost,
 		msecs_to_jiffies(10));
 }
@@ -440,6 +439,10 @@ int __init intelli_plug_init(void)
 		 INTELLI_PLUG_MINOR_VERSION);
 
 	rc = input_register_handler(&intelli_plug_input_handler);
+#ifdef CONFIG_HAS_EARLYSUSPEND
+	register_early_suspend(&intelli_plug_early_suspend_struct_driver);
+#endif
+
 	intelliplug_wq = alloc_workqueue("intelliplug",
 				WQ_HIGHPRI | WQ_UNBOUND, 1);
 	intelliplug_boost_wq = alloc_workqueue("iplug_boost",
@@ -449,9 +452,6 @@ int __init intelli_plug_init(void)
 	queue_delayed_work_on(0, intelliplug_wq, &intelli_plug_work,
 		msecs_to_jiffies(10));
 
-#ifdef CONFIG_HAS_EARLYSUSPEND
-	register_early_suspend(&intelli_plug_early_suspend_struct_driver);
-#endif
 	return 0;
 }
 
