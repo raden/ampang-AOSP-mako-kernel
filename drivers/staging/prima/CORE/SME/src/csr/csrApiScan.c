@@ -7197,7 +7197,7 @@ void csrSetCfgScanControlList( tpAniSirGlobal pMac, tANI_U8 *countryCode, tCsrCh
                    
                 if (found)    // insert a pair(channel#, flag)
                 {
-                        pControlList[j+1] = csrGetScanType(pMac, pControlList[j]);     
+                    pControlList[j+1] = csrGetScanType(pMac, pControlList[j]);
                     found = FALSE;  // reset the flag
                 }
                        
