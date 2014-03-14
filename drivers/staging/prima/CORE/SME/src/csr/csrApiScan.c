@@ -3265,7 +3265,8 @@ void csrApplyChannelPowerCountryInfo( tpAniSirGlobal pMac, tCsrChannel *pChannel
         ChannelList.numChannels = numChannels;
         csrSetCfgValidChannelList(pMac, ChannelList.channelList, ChannelList.numChannels);
         // extend scan capability
-        csrSetCfgScanControlList(pMac, countryCode, &ChannelList);     //  build a scan list based on the channel list : channel# + active/passive scan
+        //  build a scan list based on the channel list : channel# + active/passive scan
+        csrSetCfgScanControlList(pMac, countryCode, &ChannelList);
         /*Send msg to Lim to clear DFS channel list */
         csrClearDfsChannelList(pMac);
 #ifdef FEATURE_WLAN_SCAN_PNO

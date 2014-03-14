@@ -1486,7 +1486,7 @@ __limProcessSmeJoinReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
     limDiagEventReport(pMac, WLAN_PE_DIAG_JOIN_REQ_EVENT, NULL, 0, 0);
 #endif //FEATURE_WLAN_DIAG_SUPPORT
 
-    PELOG1(limLog(pMac, LOG1, FL("Received SME_JOIN_REQ\n"));)
+    PELOG1(limLog(pMac, LOG1, FL("Received SME_JOIN_REQ"));)
 
 #ifdef WLAN_FEATURE_VOWIFI
     /* Need to read the CFG here itself as this is used in limExtractAPCapability() below.
