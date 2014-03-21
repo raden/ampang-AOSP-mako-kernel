@@ -22,60 +22,49 @@
 #include <linux/ktime.h>
 #include <linux/hrtimer.h>
 #include <linux/slab.h>
-#endif
-#include "acpuclock.h"
+#include <linux/spinlock.h>
+#include <linux/cpu.h>
+#include <linux/stringify.h>
+#include <linux/sched.h>
+#include <linux/platform_device.h>
+#include <linux/debugfs.h>
+#include <linux/cpu_pm.h>
+#include <linux/cpu.h>
+#include <linux/cpufreq.h>
+#include <linux/sched.h>
+#include <linux/rq_stats.h>
+#include <asm/atomic.h>
+#include <asm/page.h>
+#include <mach/msm_dcvs.h>
+#include <mach/msm_dcvs_scm.h>
+#define CREATE_TRACE_POINTS
+#include <trace/events/mpdcvs_trace.h>
 
-#define DEBUG 0
+#define DEFAULT_RQ_AVG_POLL_MS    (1)
+#define DEFAULT_RQ_AVG_DIVIDE    (25)
 
-DEFINE_PER_CPU(struct msm_mpdec_cpudata_t, msm_mpdec_cpudata);
-EXPORT_PER_CPU_SYMBOL_GPL(msm_mpdec_cpudata);
+struct mpd_attrib {
+	struct kobj_attribute	enabled;
+	struct kobj_attribute	rq_avg_poll_ms;
+	struct kobj_attribute	iowait_threshold_pct;
 
-static bool mpdec_suspended = false;
-#ifndef CONFIG_HAS_EARLYSUSPEND
-static struct notifier_block msm_mpdec_lcd_notif;
-#endif
-static struct delayed_work msm_mpdec_work;
-static struct workqueue_struct *msm_mpdec_workq;
-static DEFINE_MUTEX(mpdec_msm_cpu_lock);
-static DEFINE_MUTEX(mpdec_msm_susres_lock);
-#ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-static struct workqueue_struct *mpdec_input_wq;
-static DEFINE_PER_CPU(struct work_struct, mpdec_input_work);
-static struct workqueue_struct *msm_mpdec_revib_workq;
-static DEFINE_PER_CPU(struct delayed_work, msm_mpdec_revib_work);
-#endif
-
-static struct msm_mpdec_tuners {
-	unsigned int startdelay;
-	unsigned int delay;
-	unsigned int pause;
-	bool scroff_single_core;
-	unsigned long int idle_freq;
-	unsigned int max_cpus;
-	unsigned int min_cpus;
-#ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-	bool boost_enabled;
-	unsigned int boost_time;
-	unsigned long int boost_freq[4];
-#endif
-} msm_mpdec_tuners_ins = {
-	.startdelay = MSM_MPDEC_STARTDELAY,
-	.delay = MSM_MPDEC_DELAY,
-	.pause = MSM_MPDEC_PAUSE,
-	.scroff_single_core = true,
-	.idle_freq = MSM_MPDEC_IDLE_FREQ,
-	.max_cpus = CONFIG_NR_CPUS,
-	.min_cpus = 2,
-#ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-	.boost_enabled = true,
-	.boost_time = MSM_MPDEC_BOOSTTIME,
-	.boost_freq = {
-		MSM_MPDEC_BOOSTFREQ_CPU0,
-		MSM_MPDEC_BOOSTFREQ_CPU1,
-		MSM_MPDEC_BOOSTFREQ_CPU2,
-		MSM_MPDEC_BOOSTFREQ_CPU3
-	},
-#endif
+	struct kobj_attribute	rq_avg_divide;
+	struct kobj_attribute	em_win_size_min_us;
+	struct kobj_attribute	em_win_size_max_us;
+	struct kobj_attribute	em_max_util_pct;
+	struct kobj_attribute	mp_em_rounding_point_min;
+	struct kobj_attribute	mp_em_rounding_point_max;
+	struct kobj_attribute	online_util_pct_min;
+	struct kobj_attribute	online_util_pct_max;
+	struct kobj_attribute	slack_time_min_us;
+	struct kobj_attribute	slack_time_max_us;
+	struct kobj_attribute	hp_up_max_ms;
+	struct kobj_attribute	hp_up_ms;
+	struct kobj_attribute	hp_up_count;
+	struct kobj_attribute	hp_dw_max_ms;
+	struct kobj_attribute	hp_dw_ms;
+	struct kobj_attribute	hp_dw_count;
+	struct attribute_group	attrib_group;
 };
 
 struct msm_mpd_scm_data {
