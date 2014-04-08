@@ -9,7 +9,7 @@ export CROSS_COMPILE=/opt/sabermod-gcc/bin/arm-eabi-
 
 export KBUILD_BUILD_USER=najmi
 export KBUILD_BUILD_HOST="kampung-pandan"
-export LOCALVERSION="-Semaphore-Pandan-CM11-N4_2.0.5.2-UC"
+export LOCALVERSION="-Semaphore-Pandan-CM11-N4_2.1.0"
 
 #echo "Copy backup config..."
 #cp najmi-mako-config .config
