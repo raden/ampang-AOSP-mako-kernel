@@ -25,7 +25,7 @@
 #include <linux/earlysuspend.h>
 
 #define INTELLI_PLUG_MAJOR_VERSION	3
-#define INTELLI_PLUG_MINOR_VERSION	2
+#define INTELLI_PLUG_MINOR_VERSION	1
 
 #define DEF_SAMPLING_MS			(40)
 #define BUSY_SAMPLING_MS		(20)
@@ -154,6 +154,7 @@ static void intelli_plug_active_eval_fn(unsigned int status)
 			queue_delayed_work_on(0, intelliplug_wq, &intelli_plug_work,
 					msecs_to_jiffies(sampling_time_on));
 	} else {
+		flush_workqueue(intelliplug_wq);
 		cancel_delayed_work_sync(&intelli_plug_work);
 	}
 }
@@ -506,6 +507,9 @@ static void intelli_plug_late_resume(struct early_suspend *handler)
 		for (i = 1; i < num_of_active_cores; i++) {
 			cpu_up(i);
 		}
+		if (!delayed_work_pending(&intelli_plug_work))
+			queue_delayed_work_on(0, intelliplug_wq, &intelli_plug_work,
+				msecs_to_jiffies(sampling_time_on));
 	}
 }
 
@@ -530,16 +534,10 @@ static int __init intelli_plug_init(void)
 	register_early_suspend(&intelli_plug_early_suspend_struct_driver);
 #endif
 
-#ifdef CONFIG_MACH_LGE
 	intelliplug_wq = alloc_workqueue("intelliplug",
-				WQ_HIGHPRI | WQ_UNBOUND, 1);
-#else
-	intelliplug_wq = alloc_workqueue("intelliplug",
-				WQ_HIGHPRI | WQ_UNBOUND, 0);
-#endif
-
+				WQ_POWER_EFFICIENT, 0);
 	if (!intelliplug_wq) {
-		printk(KERN_ERR "Failed to create intelliplug \
+		printk(KERN_ERR "Failed to create intelliplug_wq \
 				workqueue\n");
 		return -EFAULT;
 	}
