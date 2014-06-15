@@ -365,15 +365,8 @@ static int ashmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	if (!sc->nr_to_scan)
 		return lru_count;
 
-<<<<<<< HEAD
-	/* avoid recursing into this code from within ashmem itself */
-	if (!mutex_trylock(&ashmem_mutex)) {
-		return -1;
-	}
-=======
 	if (!mutex_trylock(&ashmem_mutex))
 		return -1;
->>>>>>> a6edd5e48e963f32d0d7017e290f1c0658265d5a
 
 	list_for_each_entry_safe(range, next, &ashmem_lru_list, lru) {
 		struct inode *inode = range->asma->file->f_dentry->d_inode;

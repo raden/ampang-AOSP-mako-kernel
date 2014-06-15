@@ -234,16 +234,9 @@ ssize_t seq_read(struct file *file, char __user *buf, size_t size, loff_t *ppos)
 		if (m->count < m->size)
 			goto Fill;
 		m->op->stop(m, p);
-<<<<<<< HEAD
-		is_vmalloc_addr(m->buf) ? vfree(m->buf) : kfree(m->buf);
-		m->buf = kmalloc(m->size <<= 1, GFP_KERNEL | __GFP_NOWARN);
-		if (!m->buf)
-			m->buf = vmalloc(m->size);
-=======
 		kfree(m->buf);
 		m->count = 0;
 		m->buf = kmalloc(m->size <<= 1, GFP_KERNEL);
->>>>>>> a6edd5e48e963f32d0d7017e290f1c0658265d5a
 		if (!m->buf)
 			goto Enomem;
 		m->version = 0;
