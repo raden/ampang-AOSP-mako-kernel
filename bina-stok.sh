@@ -10,7 +10,7 @@ export CROSS_COMPILE=/opt/gcc-linaro/arm-linux-gnueabi-linaro_4.8.3-2014.02/bin/
 
 export KBUILD_BUILD_USER=najmi
 export KBUILD_BUILD_HOST="ampang"
-export LOCALVERSION="Zulfa-CM11-v11"
+export LOCALVERSION="Zulfa-CM11-v12"
 
 #echo "Copy backup config..."
 #cp najmi-mako-config .config
