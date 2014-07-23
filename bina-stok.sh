@@ -3,8 +3,7 @@ unset CROSS_COMPILE
 #export CROSS_COMPILE=/opt/gcc-4.8-linaro/bin/arm-cortex_a15-linux-gnueabi- 
 #export CROSS_COMPILE=/opt/gcc-4.7-linaro/bin/arm-cortex_a15-linux-gnueabi- 
 #export CROSS_COMPILE=/opt/sabermod-gcc/bin/arm-eabi-
-export CROSS_COMPILE=/opt/gcc-linaro/arm-linux-gnueabi-linaro_4.8.3-2014.02/bin/arm-linux-gnueabi-
-
+export CROSS_COMPILE=/opt/gcc-linaro/arm-cortex_a15-linux-gnueabihf-linaro_4.9.1-2014.07/bin/arm-cortex_a15-linux-gnueabihf-
 #echo "Cleaning old craps..."
 #make distclean
 
